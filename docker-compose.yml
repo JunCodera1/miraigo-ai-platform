@@ -1,0 +1,35 @@
+# Standalone AI platform. Models are NOT baked into the image: download them once with
+#   scripts/download_models.sh ./models
+# and they are mounted read-only below.
+name: miraigo-ai
+
+services:
+  ai:
+    build: .
+    image: miraigo-ai-platform:latest
+    container_name: miraigo_ai_platform
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    # `environment` wins over `env_file`: these values are about the container itself, so a
+    # .env written for running on the host (JAI_HOST=127.0.0.1, ~/... paths, localhost backend)
+    # cannot break it.
+    environment:
+      JAI_HOST: 0.0.0.0
+      JAI_PORT: "8090"
+      JAI_MODELS_DIR: /models
+      # The MiraiGo backend as seen from inside this container.
+      JAI_BACKEND_BASE_URL: ${JAI_DOCKER_BACKEND_BASE_URL:-http://host.docker.internal:8080}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${JAI_PUBLISH_PORT:-8090}:8090"
+    volumes:
+      - ${JAI_MODELS_HOST_DIR:-./models}:/models:ro
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    mem_limit: ${JAI_MEM_LIMIT:-3g}
+    read_only: true
+    security_opt:
+      - no-new-privileges:true

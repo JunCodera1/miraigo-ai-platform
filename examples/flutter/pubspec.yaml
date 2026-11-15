@@ -1,0 +1,10 @@
+name: miraigo_ai_client
+description: Dart/Flutter client for the MiraiGo Japanese AI Platform.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  http: ^1.2.0

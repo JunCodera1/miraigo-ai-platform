@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "japanese-ai-platform"
+version = "0.1.0"
+description = "Modular Japanese AI platform (speech, language, pronunciation) for MiraiGo clients"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "python-multipart>=0.0.9",
+  "httpx>=0.27",
+  "pyyaml>=6.0",
+  "numpy>=2.0",
+  "sudachipy>=0.6.8",
+  "sudachidict-core>=20240716",
+]
+
+[project.optional-dependencies]
+# Local speech engines are optional so an API-only deployment stays small.
+sherpa = ["sherpa-onnx>=2.0"]
+faster-whisper = ["faster-whisper>=1.2"]
+local = ["sherpa-onnx>=2.0", "faster-whisper>=1.2"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+japanese-ai = "japanese_ai.main:run"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+japanese_ai = ["model_registry/models.yaml"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
+markers = [
+  "models: needs local model files on disk (skipped when they are missing)",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "ASYNC", "S"]
+ignore = ["S101", "S603", "S607", "B008", "E501", "UP046", "UP047", "ASYNC109"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106", "S108"]
+"scripts/*" = ["S310", "S108"]
+
+[tool.ruff.format]
+quote-style = "double"

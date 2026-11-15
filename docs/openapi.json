@@ -1,0 +1,1269 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "MiraiGo Japanese AI Platform",
+  "description": "Speech, pronunciation and Japanese-language services for MiraiGo clients. Every JSON response uses the MiraiGo envelope: {status, message, errorCode?, data?, errors?, path, timestamp, requestId}.",
+  "version": "0.1.0"
+ },
+ "paths": {
+  "/health/live": {
+   "get": {
+    "tags": [
+     "system"
+    ],
+    "summary": "Process is up",
+    "operationId": "live_health_live_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_dict_str__str__"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/health/ready": {
+   "get": {
+    "tags": [
+     "system"
+    ],
+    "summary": "Ready to serve, per capability",
+    "operationId": "ready_health_ready_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_HealthOut_"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/models": {
+   "get": {
+    "tags": [
+     "system"
+    ],
+    "summary": "Registered models and their availability",
+    "operationId": "list_models_api_v1_models_get",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     },
+     {
+      "name": "x-api-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_list_ModelOut__"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/admin/usage": {
+   "get": {
+    "tags": [
+     "system"
+    ],
+    "summary": "Per-model usage since start (admin)",
+    "operationId": "usage_api_v1_admin_usage_get",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     },
+     {
+      "name": "x-api-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_list_dict__"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/language/analyze": {
+   "post": {
+    "tags": [
+     "language"
+    ],
+    "summary": "Tokens, readings, furigana, romaji and conjugation (deterministic)",
+    "operationId": "analyze_api_v1_language_analyze_post",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     },
+     {
+      "name": "x-api-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AnalyzeIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_AnalyzeOut_"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/speech/transcribe": {
+   "post": {
+    "tags": [
+     "speech"
+    ],
+    "summary": "Japanese speech to text, with timestamps; JSON, SRT or WebVTT",
+    "operationId": "transcribe_api_v1_speech_transcribe_post",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     },
+     {
+      "name": "x-api-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_transcribe_api_v1_speech_transcribe_post"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_TranscriptionOut_"
+        }
+       },
+       "text/plain": {},
+       "text/vtt": {}
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/pronunciation/evaluate": {
+   "post": {
+    "tags": [
+     "pronunciation"
+    ],
+    "summary": "Score a read-aloud recording against reference text",
+    "operationId": "evaluate_api_v1_pronunciation_evaluate_post",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     },
+     {
+      "name": "x-api-key",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "X-Api-Key"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_evaluate_api_v1_pronunciation_evaluate_post"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ApiResponse_PronunciationOut_"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "AnalyzeIn": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "minLength": 1,
+      "title": "Text",
+      "examples": [
+       "私は毎日日本語を勉強しています。"
+      ]
+     },
+     "splitMode": {
+      "type": "string",
+      "enum": [
+       "A",
+       "B",
+       "C"
+      ],
+      "title": "Splitmode",
+      "description": "A = shortest units, C = longest",
+      "default": "C"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text"
+    ],
+    "title": "AnalyzeIn"
+   },
+   "AnalyzeOut": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "title": "Text"
+     },
+     "reading": {
+      "type": "string",
+      "title": "Reading",
+      "description": "Whole sentence in hiragana"
+     },
+     "romaji": {
+      "type": "string",
+      "title": "Romaji"
+     },
+     "tokens": {
+      "items": {
+       "$ref": "#/components/schemas/TokenOut"
+      },
+      "type": "array",
+      "title": "Tokens"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text",
+     "reading",
+     "romaji",
+     "tokens"
+    ],
+    "title": "AnalyzeOut"
+   },
+   "ApiResponse_AnalyzeOut_": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "ApiResponse_HealthOut_": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "ApiResponse_PronunciationOut_": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "ApiResponse_TranscriptionOut_": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "ApiResponse_dict_str__str__": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "ApiResponse_list_ModelOut__": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "ApiResponse_list_dict__": {
+    "additionalProperties": true,
+    "type": "object"
+   },
+   "Body_evaluate_api_v1_pronunciation_evaluate_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File",
+      "description": "Recording of the learner reading the reference text"
+     },
+     "referenceText": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Referencetext"
+     },
+     "model": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Model"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file",
+     "referenceText"
+    ],
+    "title": "Body_evaluate_api_v1_pronunciation_evaluate_post"
+   },
+   "Body_transcribe_api_v1_speech_transcribe_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File",
+      "description": "Audio or video (wav, mp3, m4a, webm, ogg, mp4, ...)"
+     },
+     "model": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Model",
+      "description": "Registry model id; default routing when omitted"
+     },
+     "wordTimestamps": {
+      "type": "boolean",
+      "title": "Wordtimestamps",
+      "default": false
+     },
+     "responseFormat": {
+      "type": "string",
+      "enum": [
+       "json",
+       "srt",
+       "vtt"
+      ],
+      "title": "Responseformat",
+      "default": "json"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_transcribe_api_v1_speech_transcribe_post"
+   },
+   "CountsOut": {
+    "properties": {
+     "morae": {
+      "type": "integer",
+      "title": "Morae"
+     },
+     "matched": {
+      "type": "integer",
+      "title": "Matched"
+     },
+     "substituted": {
+      "type": "integer",
+      "title": "Substituted"
+     },
+     "omitted": {
+      "type": "integer",
+      "title": "Omitted"
+     },
+     "inserted": {
+      "type": "integer",
+      "title": "Inserted"
+     }
+    },
+    "type": "object",
+    "required": [
+     "morae",
+     "matched",
+     "substituted",
+     "omitted",
+     "inserted"
+    ],
+    "title": "CountsOut"
+   },
+   "ExecutionMeta": {
+    "properties": {
+     "model": {
+      "type": "string",
+      "title": "Model",
+      "description": "Registry id of the model that produced the result"
+     },
+     "provider": {
+      "type": "string",
+      "title": "Provider"
+     },
+     "processingMs": {
+      "type": "integer",
+      "title": "Processingms"
+     },
+     "estimatedCostUsd": {
+      "type": "number",
+      "title": "Estimatedcostusd"
+     },
+     "fallbackUsed": {
+      "type": "boolean",
+      "title": "Fallbackused"
+     }
+    },
+    "type": "object",
+    "required": [
+     "model",
+     "provider",
+     "processingMs",
+     "estimatedCostUsd",
+     "fallbackUsed"
+    ],
+    "title": "ExecutionMeta"
+   },
+   "FuriganaOut": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "title": "Text"
+     },
+     "reading": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reading"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text",
+     "reading"
+    ],
+    "title": "FuriganaOut"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "HealthOut": {
+    "properties": {
+     "status": {
+      "type": "string",
+      "enum": [
+       "ok",
+       "degraded"
+      ],
+      "title": "Status"
+     },
+     "version": {
+      "type": "string",
+      "title": "Version"
+     },
+     "env": {
+      "type": "string",
+      "title": "Env"
+     },
+     "capabilities": {
+      "additionalProperties": {
+       "type": "boolean"
+      },
+      "type": "object",
+      "title": "Capabilities"
+     }
+    },
+    "type": "object",
+    "required": [
+     "status",
+     "version",
+     "env",
+     "capabilities"
+    ],
+    "title": "HealthOut"
+   },
+   "IssueOut": {
+    "properties": {
+     "type": {
+      "type": "string",
+      "title": "Type"
+     },
+     "expected": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Expected"
+     },
+     "heard": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Heard"
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     }
+    },
+    "type": "object",
+    "required": [
+     "type",
+     "expected",
+     "heard",
+     "message"
+    ],
+    "title": "IssueOut"
+   },
+   "ModelOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "capability": {
+      "type": "string",
+      "title": "Capability"
+     },
+     "provider": {
+      "type": "string",
+      "title": "Provider"
+     },
+     "deployment": {
+      "type": "string",
+      "title": "Deployment"
+     },
+     "languages": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Languages"
+     },
+     "license": {
+      "type": "string",
+      "title": "License"
+     },
+     "source": {
+      "type": "string",
+      "title": "Source"
+     },
+     "description": {
+      "type": "string",
+      "title": "Description"
+     },
+     "enabled": {
+      "type": "boolean",
+      "title": "Enabled"
+     },
+     "available": {
+      "type": "boolean",
+      "title": "Available"
+     },
+     "unavailableReason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unavailablereason"
+     },
+     "features": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Features"
+     },
+     "routingRole": {
+      "type": "string",
+      "enum": [
+       "primary",
+       "fallback",
+       "none"
+      ],
+      "title": "Routingrole",
+      "description": "Role in the transcription route"
+     },
+     "routingRoles": {
+      "additionalProperties": {
+       "type": "string",
+       "enum": [
+        "primary",
+        "fallback",
+        "none"
+       ]
+      },
+      "type": "object",
+      "title": "Routingroles",
+      "description": "Role per route"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "capability",
+     "provider",
+     "deployment",
+     "languages",
+     "license",
+     "source",
+     "description",
+     "enabled",
+     "available",
+     "unavailableReason",
+     "features",
+     "routingRole",
+     "routingRoles"
+    ],
+    "title": "ModelOut"
+   },
+   "PronunciationOut": {
+    "properties": {
+     "method": {
+      "type": "string",
+      "title": "Method"
+     },
+     "referenceText": {
+      "type": "string",
+      "title": "Referencetext"
+     },
+     "recognizedText": {
+      "type": "string",
+      "title": "Recognizedtext"
+     },
+     "scores": {
+      "$ref": "#/components/schemas/ScoresOut"
+     },
+     "counts": {
+      "$ref": "#/components/schemas/CountsOut"
+     },
+     "speechRateMoraePerSecond": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Speechratemoraepersecond"
+     },
+     "durationSeconds": {
+      "type": "number",
+      "title": "Durationseconds"
+     },
+     "words": {
+      "items": {
+       "$ref": "#/components/schemas/WordScoreOut"
+      },
+      "type": "array",
+      "title": "Words"
+     },
+     "limitations": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Limitations"
+     },
+     "meta": {
+      "$ref": "#/components/schemas/ExecutionMeta"
+     }
+    },
+    "type": "object",
+    "required": [
+     "method",
+     "referenceText",
+     "recognizedText",
+     "scores",
+     "counts",
+     "speechRateMoraePerSecond",
+     "durationSeconds",
+     "words",
+     "limitations",
+     "meta"
+    ],
+    "title": "PronunciationOut"
+   },
+   "ScoresOut": {
+    "properties": {
+     "overall": {
+      "type": "integer",
+      "maximum": 100.0,
+      "minimum": 0.0,
+      "title": "Overall"
+     },
+     "accuracy": {
+      "type": "integer",
+      "maximum": 100.0,
+      "minimum": 0.0,
+      "title": "Accuracy"
+     },
+     "completeness": {
+      "type": "integer",
+      "maximum": 100.0,
+      "minimum": 0.0,
+      "title": "Completeness"
+     }
+    },
+    "type": "object",
+    "required": [
+     "overall",
+     "accuracy",
+     "completeness"
+    ],
+    "title": "ScoresOut"
+   },
+   "SegmentOut": {
+    "properties": {
+     "start": {
+      "type": "number",
+      "title": "Start"
+     },
+     "end": {
+      "type": "number",
+      "title": "End"
+     },
+     "text": {
+      "type": "string",
+      "title": "Text"
+     },
+     "words": {
+      "anyOf": [
+       {
+        "items": {
+         "$ref": "#/components/schemas/WordOut"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Words"
+     }
+    },
+    "type": "object",
+    "required": [
+     "start",
+     "end",
+     "text"
+    ],
+    "title": "SegmentOut"
+   },
+   "TokenOut": {
+    "properties": {
+     "surface": {
+      "type": "string",
+      "title": "Surface"
+     },
+     "lemma": {
+      "type": "string",
+      "title": "Lemma"
+     },
+     "reading": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reading",
+      "description": "Hiragana, as pronounced"
+     },
+     "romaji": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Romaji"
+     },
+     "pos": {
+      "type": "string",
+      "title": "Pos"
+     },
+     "posDetail": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Posdetail"
+     },
+     "conjugationType": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conjugationtype"
+     },
+     "conjugationForm": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conjugationform"
+     },
+     "conjugationFormEn": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Conjugationformen"
+     },
+     "furigana": {
+      "anyOf": [
+       {
+        "items": {
+         "$ref": "#/components/schemas/FuriganaOut"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Furigana"
+     },
+     "start": {
+      "type": "integer",
+      "title": "Start"
+     },
+     "end": {
+      "type": "integer",
+      "title": "End"
+     },
+     "isWord": {
+      "type": "boolean",
+      "title": "Isword"
+     },
+     "isOov": {
+      "type": "boolean",
+      "title": "Isoov"
+     }
+    },
+    "type": "object",
+    "required": [
+     "surface",
+     "lemma",
+     "reading",
+     "romaji",
+     "pos",
+     "posDetail",
+     "conjugationType",
+     "conjugationForm",
+     "conjugationFormEn",
+     "furigana",
+     "start",
+     "end",
+     "isWord",
+     "isOov"
+    ],
+    "title": "TokenOut"
+   },
+   "TranscriptionOut": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "title": "Text"
+     },
+     "language": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Language"
+     },
+     "durationSeconds": {
+      "type": "number",
+      "title": "Durationseconds"
+     },
+     "segments": {
+      "items": {
+       "$ref": "#/components/schemas/SegmentOut"
+      },
+      "type": "array",
+      "title": "Segments"
+     },
+     "meta": {
+      "$ref": "#/components/schemas/ExecutionMeta"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text",
+     "language",
+     "durationSeconds",
+     "segments",
+     "meta"
+    ],
+    "title": "TranscriptionOut"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   },
+   "WordOut": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "title": "Text"
+     },
+     "start": {
+      "type": "number",
+      "title": "Start"
+     },
+     "end": {
+      "type": "number",
+      "title": "End"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text",
+     "start",
+     "end"
+    ],
+    "title": "WordOut"
+   },
+   "WordScoreOut": {
+    "properties": {
+     "text": {
+      "type": "string",
+      "title": "Text"
+     },
+     "expected": {
+      "type": "string",
+      "title": "Expected"
+     },
+     "heard": {
+      "type": "string",
+      "title": "Heard"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "ok",
+       "partial",
+       "missed"
+      ],
+      "title": "Status"
+     },
+     "issues": {
+      "items": {
+       "$ref": "#/components/schemas/IssueOut"
+      },
+      "type": "array",
+      "title": "Issues"
+     }
+    },
+    "type": "object",
+    "required": [
+     "text",
+     "expected",
+     "heard",
+     "status",
+     "issues"
+    ],
+    "title": "WordScoreOut"
+   }
+  }
+ }
+}

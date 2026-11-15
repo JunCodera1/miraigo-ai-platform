@@ -1,0 +1,121 @@
+# Model registry. Edit this file (or point JAI_MODELS_FILE at a copy) to add, swap or disable
+# models. Quality numbers are not stored here: see lab/EXPERIMENT_RESULTS.md.
+# `config.dir` paths are relative to JAI_MODELS_DIR.
+
+models:
+  - id: sensevoice-small-int8
+    capability: asr
+    provider: sherpa_onnx
+    deployment: local
+    languages: [ja, zh, en, ko, yue]
+    license: "FunASR Model Open Source License v1.1 (custom: attribution + keep model name; no explicit commercial clause - owner review)"
+    source: https://github.com/k2-fsa/sherpa-onnx/releases/tag/asr-models
+    description: SenseVoice Small (original 2024-07-17 multilingual build), int8 ONNX. FLEURS-ja CER 8.5%, RTF 0.023 on 4 CPU threads (lab EXPERIMENT_RESULTS E-001). Per-character timestamps.
+    features: {timestamps: token, streaming: vad_segmented, punctuation: true}
+    config:
+      family: sense_voice
+      dir: sherpa/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17
+      files: {model: model.int8.onnx, tokens: tokens.txt}
+      language: ja
+      num_threads: 4
+
+  - id: reazonspeech-zipformer-ja
+    capability: asr
+    provider: sherpa_onnx
+    deployment: local
+    languages: [ja]
+    license: Apache-2.0
+    source: https://huggingface.co/reazon-research/reazonspeech-k2-v2
+    description: ReazonSpeech k2 v2 Zipformer transducer (int8), Japanese only. Token timestamps.
+    features: {timestamps: token, streaming: vad_segmented}
+    config:
+      family: transducer
+      dir: sherpa/sherpa-onnx-zipformer-ja-reazonspeech-2024-08-01
+      files:
+        encoder: encoder-epoch-99-avg-1.int8.onnx
+        decoder: decoder-epoch-99-avg-1.onnx
+        joiner: joiner-epoch-99-avg-1.int8.onnx
+        tokens: tokens.txt
+      num_threads: 4
+
+  - id: parakeet-tdt-ctc-0.6b-ja
+    capability: asr
+    provider: sherpa_onnx
+    deployment: local
+    languages: [ja]
+    license: CC-BY-4.0
+    source: https://huggingface.co/nvidia/parakeet-tdt_ctc-0.6b-ja
+    description: NVIDIA Parakeet TDT-CTC 0.6B Japanese, CTC head exported to int8 ONNX.
+    features: {timestamps: token}
+    config:
+      family: nemo_ctc
+      dir: sherpa/sherpa-onnx-nemo-parakeet-tdt_ctc-0.6b-ja-35000-int8
+      files: {model: model.int8.onnx, tokens: tokens.txt}
+      num_threads: 4
+
+  - id: moonshine-base-ja
+    capability: asr
+    provider: sherpa_onnx
+    deployment: local
+    languages: [ja]
+    license: "Moonshine Community License (NON-COMMERCIAL for non-English models)"
+    source: https://huggingface.co/UsefulSensors/moonshine-base-ja
+    description: Moonshine base ja. Disabled - non-commercial licence; also least accurate in E-001 (CER 12.2%).
+    enabled: false
+    features: {timestamps: segment}
+    config:
+      family: moonshine_v2
+      dir: sherpa/sherpa-onnx-moonshine-base-ja-quantized-2026-02-27
+      files: {encoder: encoder_model.ort, decoder: decoder_model_merged.ort, tokens: tokens.txt}
+      num_threads: 4
+
+  - id: whisper-small-ct2
+    capability: asr
+    provider: faster_whisper
+    deployment: local
+    languages: [multilingual]
+    license: MIT
+    source: https://huggingface.co/Systran/faster-whisper-small
+    description: Whisper small via CTranslate2 int8. Word timestamps. Downloads on first use.
+    features: {timestamps: word}
+    config: {model: small, compute_type: int8, cpu_threads: 4, beam_size: 5}
+
+  - id: openai-gpt-4o-mini-transcribe
+    capability: asr
+    provider: openai_compatible
+    deployment: remote_api
+    languages: [multilingual]
+    license: commercial API
+    source: https://developers.openai.com/api/docs/pricing
+    description: OpenAI hosted transcription. Needs OPENAI_API_KEY. Audio leaves the platform.
+    cost: {unit: audio_minute, usd: 0.003}
+    config:
+      base_url: https://api.openai.com/v1
+      model: gpt-4o-mini-transcribe
+      api_key_env: OPENAI_API_KEY
+
+  - id: legacy-voiceai
+    capability: asr
+    provider: legacy_voiceai
+    deployment: external_service
+    languages: [ja, vi, en, ko, zh]
+    license: project-internal
+    source: https://github.com/JunCodera1/speech-language-model
+    description: Original MiraiGo prototype (ECAPA language ID + Whisper base). Baseline only.
+    enabled: false
+    config: {base_url: "http://localhost:8000", timeout_seconds: 60}
+
+routing:
+  asr:
+    primary: sensevoice-small-int8
+    # E-001: SenseVoice best speed/accuracy; ReazonSpeech is Apache-2.0 and has token timestamps.
+    fallbacks: [reazonspeech-zipformer-ja, parakeet-tdt-ctc-0.6b-ja, openai-gpt-4o-mini-transcribe]
+    timeout_seconds: 120
+    max_retries: 1
+  # Pronunciation scoring wants a recogniser that "repairs" little and no licence question:
+  # ReazonSpeech (Apache-2.0) scored correct native speech highest in E-002 (90/100 >= 90 vs 86).
+  pronunciation:
+    primary: reazonspeech-zipformer-ja
+    fallbacks: [sensevoice-small-int8, parakeet-tdt-ctc-0.6b-ja]
+    timeout_seconds: 60
+    max_retries: 1
